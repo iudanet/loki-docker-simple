@@ -35,8 +35,7 @@ services:
     restart: unless-stopped
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
-      - GF_SECURITY_ADMIN_PASSWORD=super_pass
-      - GF_SERVER_ROOT_URL=/grafana/
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_PASSWORD:-super_pass}
     entrypoint:
       - sh
       - -euc
@@ -59,6 +58,6 @@ services:
     volumes:
       - data_grafana:/var/lib/grafana
     ports:
-      - "${GRAFANA_PUBLIC_HOST:-127.0.0.1:3000}:3000"
+      - "${GF_PUBLIC_HOST:-127.0.0.1:3000}:3000"
     networks:
       - loki

@@ -1,1 +1,1 @@
-# loki-docker-simle
+# loki-docker-simple

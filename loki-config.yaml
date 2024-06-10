@@ -34,3 +34,4 @@ compactor:
   delete_request_store: filesystem
 limits_config:
   retention_period: 14d
+  # reject_old_samples: false

@@ -39,3 +39,9 @@ scrape_configs:
           - '__meta_docker_container_label_com_docker_compose_service'
         regex: '(.*)'
         target_label: 'compose_service'
+    pipeline_stages:
+      - docker: {}
+      - drop:
+          # Workaround https://github.com/grafana/loki/issues/7103
+          older_than: 24h
+          drop_counter_reason: docker_duplicates

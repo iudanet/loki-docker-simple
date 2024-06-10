@@ -1,0 +1,64 @@
+version: "3"
+volumes:
+  data_grafana:
+  data_loki:
+
+
+networks:
+  loki:
+
+services:
+
+  loki:
+    image: grafana/loki:3.0.0
+    restart: unless-stopped
+    volumes:
+      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
+      - ${LOKI_STORAGE_DIR:-data_loki}:/loki
+    # ports:
+    #   - "3100:3100"
+    command: -config.file=/etc/loki/loki-config.yaml
+    networks:
+      - loki
+
+  promtail:
+    restart: unless-stopped
+    image: grafana/promtail:3.0.0
+    volumes:
+      - ./promtail-docker.yaml:/etc/promtail/promtail-docker.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: -config.file=/etc/promtail/promtail-docker.yaml
+    networks:
+      - loki
+
+  grafana:
+    restart: unless-stopped
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SECURITY_ADMIN_PASSWORD=super_pass
+      - GF_SERVER_ROOT_URL=/grafana/
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+          - name: Loki
+            type: loki
+            access: proxy
+            url: http://loki:3100
+            jsonData:
+              httpHeaderName1: "X-Scope-OrgID"
+            secureJsonData:
+              httpHeaderValue1: "tenant1"
+        EOF
+        /run.sh
+    image: grafana/grafana:latest
+    volumes:
+      - data_grafana:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PUBLIC_HOST:-127.0.0.1:3000}:3000"
+    networks:
+      - loki

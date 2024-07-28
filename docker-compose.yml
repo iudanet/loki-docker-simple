@@ -10,7 +10,7 @@ networks:
 services:
 
   loki:
-    image: grafana/loki:3.0.0
+    image: grafana/loki:3.1.0
     restart: unless-stopped
     volumes:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
@@ -23,11 +23,16 @@ services:
 
   promtail:
     restart: unless-stopped
-    image: grafana/promtail:3.0.0
+    image: grafana/promtail:3.1.0
     volumes:
       - ./promtail-docker.yaml:/etc/promtail/promtail-docker.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: -config.file=/etc/promtail/promtail-docker.yaml
+    command:
+      - -config.file=/etc/promtail/promtail-docker.yaml
+      - -config.expand-env=true
+    environment:
+      - SERVER_NAME=${HOSTNAME}
+      - LOKI_URL
     networks:
       - loki
 

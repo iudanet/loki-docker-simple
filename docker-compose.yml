@@ -18,8 +18,8 @@ services:
     volumes:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - ${LOKI_STORAGE_DIR:-data_loki}:/loki
-    # ports:
-    #   - "3100:3100"
+    ports:
+      - "${LOKI_PUBLIC_HOST:-127.0.0.1:3100}:3100"
     command: -config.file=/etc/loki/loki-config.yaml
     networks:
       - loki

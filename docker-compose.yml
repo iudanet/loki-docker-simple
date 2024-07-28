@@ -43,7 +43,7 @@ services:
       - loki
 
   grafana:
-    profiles: ["all", "logs"]
+    profiles: ["all"]
     labels:
       - env=${APP_ENV:-infra}
     restart: unless-stopped

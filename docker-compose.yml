@@ -10,6 +10,7 @@ networks:
 services:
 
   loki:
+    profiles: ["all"]
     labels:
       - env=${APP_ENV:-infra}
     image: grafana/loki:3.1.0
@@ -24,6 +25,7 @@ services:
       - loki
 
   promtail:
+    profiles: ["all", logs]
     labels:
       - env=${APP_ENV:-infra}
     restart: unless-stopped
@@ -41,6 +43,7 @@ services:
       - loki
 
   grafana:
+    profiles: ["all", logs]
     labels:
       - env=${APP_ENV:-infra}
     restart: unless-stopped

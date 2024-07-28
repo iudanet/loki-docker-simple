@@ -36,6 +36,10 @@ scrape_configs:
           - '__meta_docker_container_label_com_docker_compose_service'
         regex: '(.*)'
         target_label: 'compose_service'
+      - source_labels:
+          - '__meta_docker_container_label_env'
+        regex: '(.*)'
+        target_label: 'app_env'
     pipeline_stages:
       - static_labels:
           server_name: ${SERVER_NAME:-default_server_name}

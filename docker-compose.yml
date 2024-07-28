@@ -10,6 +10,8 @@ networks:
 services:
 
   loki:
+    labels:
+      - env=${APP_ENV:-infra}
     image: grafana/loki:3.1.0
     restart: unless-stopped
     volumes:
@@ -22,6 +24,8 @@ services:
       - loki
 
   promtail:
+    labels:
+      - env=${APP_ENV:-infra}
     restart: unless-stopped
     image: grafana/promtail:3.1.0
     volumes:
@@ -37,6 +41,8 @@ services:
       - loki
 
   grafana:
+    labels:
+      - env=${APP_ENV:-infra}
     restart: unless-stopped
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning

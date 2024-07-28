@@ -31,7 +31,7 @@ services:
       - -config.file=/etc/promtail/promtail-docker.yaml
       - -config.expand-env=true
     environment:
-      - SERVER_NAME=${HOSTNAME}
+      - SERVER_NAME
       - LOKI_URL
     networks:
       - loki

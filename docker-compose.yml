@@ -10,28 +10,42 @@ networks:
 services:
 
   loki:
-    image: grafana/loki:3.0.0
+    profiles: ["all"]
+    labels:
+      - env=${APP_ENV:-infra}
+    image: grafana/loki:3.1.0
     restart: unless-stopped
     volumes:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
       - ${LOKI_STORAGE_DIR:-data_loki}:/loki
-    # ports:
-    #   - "3100:3100"
+    ports:
+      - "${LOKI_PUBLIC_HOST:-127.0.0.1:3100}:3100"
     command: -config.file=/etc/loki/loki-config.yaml
     networks:
       - loki
 
   promtail:
+    profiles: ["all", logs]
+    labels:
+      - env=${APP_ENV:-infra}
     restart: unless-stopped
-    image: grafana/promtail:3.0.0
+    image: grafana/promtail:3.1.0
     volumes:
       - ./promtail-docker.yaml:/etc/promtail/promtail-docker.yaml:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    command: -config.file=/etc/promtail/promtail-docker.yaml
+    command:
+      - -config.file=/etc/promtail/promtail-docker.yaml
+      - -config.expand-env=true
+    environment:
+      - SERVER_NAME
+      - LOKI_URL
     networks:
       - loki
 
   grafana:
+    profiles: ["all"]
+    labels:
+      - env=${APP_ENV:-infra}
     restart: unless-stopped
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
